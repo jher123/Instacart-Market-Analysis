@@ -119,14 +119,23 @@ labels_pred_train = predicted_products(features_train, train_orders)
 def f1_score(y_true_df, y_pred_df):
     f1 = []
     for y_true, y_pred in zip(y_true_df.itertuples(), y_pred_df.itertuples()):
-        y_true = set(y_true.products)
-        y_pred = set(y_pred.products)
-        intersection = len(y_true & y_pred)
+        if y_true.products == 'None':
+            y_true = set([0])
+        else:
+            y_true = set([int(p) for p in y_true.products.split()])
+
+        if y_pred.products == 'None':
+            y_pred = set([0])
+        else:
+            y_pred = set([int(p) for p in y_pred.products.split()])
+
+        intersection =  len(y_true & y_pred)
         if intersection == 0:
-            return 0.
-        precision = 1. * intersection / len(y_pred)
-        recall = 1. * intersection  / len(y_true)
-        f1.append(2. * precision * recall / (precision + recall))
+            f1.append(0)
+        else:
+            precision = 1. * intersection / len(y_pred)
+            recall = 1. * intersection  / len(y_true)
+            f1.append(2. * precision * recall / (precision + recall))
     mean_f1 = np.mean(f1)
     return mean_f1
 
